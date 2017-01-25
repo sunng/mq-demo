@@ -31,7 +31,10 @@ public class Producer {
         connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnection.DEFAULT_USER,
                 ActiveMQConnection.DEFAULT_PASSWORD,
-                "failover:(tcp://10.0.129.118:61616)?maxReconnectAttempts=1");
+                "tcp://localhost:61646");
+                // "failover:(tcp://localhost:61616,tcp://localhost:61626,tcp://localhost:61636)");
+                // "failover:(tcp://localhost:61646,tcp://localhost:61656)");
+        //?maxReconnectAttempts=1
 
         try {
             //构造从工厂得到连接对象
@@ -55,7 +58,6 @@ public class Producer {
             //得到消息生成者【发送者】
             producer = session.createProducer(destination);
 
-            //设置不持久化，此处学习，实际根据项目决定
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
             //构造消息，此处写死，项目就是参数，或者方法获取
@@ -72,21 +74,23 @@ public class Producer {
         }
     }
 
-    public static void sendMessage(Session session, MessageProducer producer)
+    public static void sendMessage(Session session, MessageProducer producer) throws Exception {
 
-            throws Exception {
-
-        int SEND_NUMBER = 5;
-        for (int i = 1; i <= SEND_NUMBER; i++) {
+        int sendCount = 100000;
+        System.out.println(System.currentTimeMillis());
+        for (int i = 1; i <= sendCount; i++) {
 
             TextMessage message = session
                     .createTextMessage("ActiveMq发送的消息" + i);
 
             //发送消息到目的地方
-            System.out.println("发送消息：" + "ActiveMq 发送的消息" + i);
+            // System.out.println("发送消息：" + "ActiveMq 发送的消息" + i);
             producer.send(message);
 
+            // Thread.sleep(1000);
+
         }
+        System.out.println(System.currentTimeMillis());
 
     }
 }

@@ -27,9 +27,10 @@ public class Consumer {
         MessageConsumer consumer;
 
         connectionFactory = new ActiveMQConnectionFactory(
-                ActiveMQConnection.DEFAULT_USER,
-                ActiveMQConnection.DEFAULT_PASSWORD,
-                "failover:(tcp://10.0.129.118:61616)");
+            ActiveMQConnection.DEFAULT_USER,
+            ActiveMQConnection.DEFAULT_PASSWORD,
+            "tcp://localhost:61646");
+            // "failover:(tcp://localhost:61616,tcp://localhost:61626,tcp://localhost:61636)");
 
         try {
             //构造从工厂得到连接对象
@@ -40,28 +41,32 @@ public class Consumer {
 
             //获取操作连接
             session = connection.createSession(false,
-                    Session.AUTO_ACKNOWLEDGE);
+                Session.AUTO_ACKNOWLEDGE);
 
             //获取session
             destination = session.createQueue("FirstQueue");
 
             consumer = session.createConsumer(destination);
+            System.out.println(System.currentTimeMillis());
             while (true) {
-                //设置接收者接收消息的时间，为了便于测试，这里谁定为100s
-                TextMessage message = (TextMessage) consumer.receive(100000);
+                TextMessage message = (TextMessage) consumer.receive(1000);
                 if (null != message) {
-                    System.out.println("收到消息" + message.getText());
+                    // System.out.println("收到消息" + message.getText());
                 } else {
                     break;
                 }
+                // Thread.sleep(1000);
             }
+            System.out.println(System.currentTimeMillis());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                if (null != connection)
+                if (null != connection) {
                     connection.close();
+                }
             } catch (Throwable ignore) {
+                ignore.printStackTrace();
             }
         }
     }
