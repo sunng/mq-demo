@@ -31,7 +31,7 @@ public class Producer {
         connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnection.DEFAULT_USER,
                 ActiveMQConnection.DEFAULT_PASSWORD,
-                "tcp://localhost:61646");
+                "tcp://localhost:61616");
                 // "failover:(tcp://localhost:61616,tcp://localhost:61626,tcp://localhost:61636)");
                 // "failover:(tcp://localhost:61646,tcp://localhost:61656)");
         //?maxReconnectAttempts=1
@@ -46,21 +46,16 @@ public class Producer {
                 }
             });
 
-            //启动
             connection.start();
 
-            //获取操作连接
-            session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(true, Session.CLIENT_ACKNOWLEDGE);
 
-            //获取session
             destination = session.createQueue("FirstQueue");
 
-            //得到消息生成者【发送者】
             producer = session.createProducer(destination);
 
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
-            //构造消息，此处写死，项目就是参数，或者方法获取
             sendMessage(session, producer);
             session.commit();
         } catch (Exception e) {
@@ -76,7 +71,7 @@ public class Producer {
 
     public static void sendMessage(Session session, MessageProducer producer) throws Exception {
 
-        int sendCount = 100000;
+        int sendCount = 1;
         System.out.println(System.currentTimeMillis());
         for (int i = 1; i <= sendCount; i++) {
 
